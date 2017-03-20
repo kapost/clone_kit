@@ -1,0 +1,18 @@
+defaults: &defaults
+  sessions:
+    default:
+      database: clone_kit
+      hosts:
+        - localhost:27017
+      options:
+        write:
+          w: 0
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
