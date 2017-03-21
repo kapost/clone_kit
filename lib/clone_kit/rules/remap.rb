@@ -3,8 +3,9 @@
 module CloneKit
   module Rules
     class Remap < CloneKit::Rule
-      def initialize(remap_hash = {})
+      def initialize(model_name, remap_hash = {})
         self.remap_hash = remap_hash
+        self.model_name = model_name
       end
 
       def fix(_old_id, attributes)
@@ -25,6 +26,9 @@ module CloneKit
 
       def remap(klass, old_id)
         shared_id_map.lookup(klass, old_id)
+      rescue ArgumentError
+        error_event("#{model_name} missing remapped id for #{klass} #{old_id}")
+        nil
       end
 
       def try?(attributes, key)
@@ -33,7 +37,8 @@ module CloneKit
 
       private
 
-      attr_accessor :remap_hash
+      attr_accessor :remap_hash,
+                    :model_name
     end
   end
 end

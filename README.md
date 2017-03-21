@@ -32,7 +32,7 @@ spec.dependencies = %w(Account BlogType)                     # Helps derive the 
     BlogPost,
     rules: [
       ReTenantRule.new,
-      CloneKit::Rules::Remap.new("Account" => "account_id", "BlogType" => "blog_type_id")
+      CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
     ]
   )
 end
