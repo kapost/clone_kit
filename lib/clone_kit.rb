@@ -5,10 +5,10 @@ require "clone_kit/graph"
 require "clone_kit/specification"
 require "clone_kit/operation"
 require "clone_kit/shared_id_map"
-require "clone_kit/operation_error"
 require "clone_kit/rule"
 
-require "active_support/core_ext/array"
+require "active_support/core_ext/array/wrap"
+require "active_support/core_ext/object/blank"
 
 module CloneKit
   def self.graph

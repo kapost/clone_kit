@@ -1,0 +1,31 @@
+# Please don't modify this file, without first checking if it makes sense to
+# adopt for most other Kapost projects. Ideally, we would keep these files as
+# similar as possible to ease maintainability. Instead, open a PR in the
+# codeclimate-common repo at https://github.com/kapost/codeclimate-common
+
+# This file is where app-specific Rubocop configs go. I wish every tool supported inherited configs...
+
+inherit_from:
+  - .rubocop.kapost.yml
+
+# Frozen string break everything in napa. This is gonna be a big project to replace
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/*.rb"
+
+Rails/ActionFilter:
+  EnforcedStyle: filter
+
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+
+# Disabled since it only applies to Rails 5. Reenable when we migrate our apps to Rails 5.
+# https://github.com/bbatsov/rubocop/issues/3629
+Rails/HttpPositionalArguments:
+  Enabled: false

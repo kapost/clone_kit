@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "redis"
-  spec.add_runtime_dependency "activesupport", "> 3.0.0" # Only for Array#wrap
+  spec.add_runtime_dependency "activesupport", "> 3.0.0" # For core ext Array#wrap and Object#blank?
 
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "mongoid", "~> 4.0.2"

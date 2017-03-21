@@ -10,15 +10,13 @@ module CloneKit
       def fix(_old_id, attributes)
         remap_hash.each do |klass, remap_attributes|
           Array.wrap(remap_attributes).each do |att|
-            next unless attributes.key?(att)
+            next unless try?(attributes, att)
 
-            if attributes[att].is_a?(Array)
-              attributes[att] = attributes[att].compact.map { |id|
-                remap(klass, id)
-              }.compact
-            elsif !attributes[att].nil?
-              attributes[att] = remap(klass, attributes[att])
-            end
+            attributes[att] = if attributes[att].is_a?(Array)
+                                attributes[att].map { |id| remap(klass, id) unless id.blank? }.compact
+                              else
+                                remap(klass, attributes[att])
+                              end
           end
         end
       end
@@ -27,6 +25,10 @@ module CloneKit
 
       def remap(klass, old_id)
         shared_id_map.lookup(klass, old_id)
+      end
+
+      def try?(attributes, key)
+        attributes.key?(key) && !attributes[key].blank?
       end
 
       private

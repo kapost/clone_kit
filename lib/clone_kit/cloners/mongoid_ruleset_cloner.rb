@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "clone_kit/rules/allow_only_mongoid_fields"
-require "clone_kit/rules/re_id_embedded_mongoid_models"
 require "clone_kit/decorators/embedded_cloner_decorator"
 
 module CloneKit

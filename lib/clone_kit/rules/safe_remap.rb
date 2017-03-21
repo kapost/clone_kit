@@ -14,7 +14,7 @@ module CloneKit
 
       def remap(klass, old_id)
         result = shared_id_map.lookup_safe(klass, old_id, safe_value)
-        warn_event("Bad ref: #{klass}/#{old_id}") if result == safe_value
+        warn_event("Missing ref: #{klass}/#{old_id}") if result == safe_value
         result
       end
 
