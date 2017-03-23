@@ -27,6 +27,7 @@ module CloneKit
       def merge(records)
         result = nil
         records.each do |rec|
+          clone_all_embedded_fields(rec)
           result = if result.nil?
                      rec.deep_dup
                    else
