@@ -41,6 +41,11 @@ RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
     expect(result[2]["embedded_example_docs"][0]["_id"]).to_not eql(embedded_doc.id)
   end
 
+  it "doesn't assign nil to empty embedded collections" do
+    result = clone
+    expect(result[0]["embedded_example_docs"]).to have(0).items
+  end
+
   it "stores id map correctly" do
     result = clone
     expect(shared_id_map.mapping("ExampleDoc")).to have(3).items.and \

@@ -56,7 +56,7 @@ module CloneKit
                        item
                      end
 
-        return nil if first_item.nil?
+        return empty_embedded(metadata) if first_item.nil?
 
         cloner = MongoidRulesetCloner.new(polymorphic_class(metadata.class_name, first_item))
         embedded_cloner = CloneKit::Decorators::EmbeddedClonerDecorator.new(cloner, records: Array.wrap(item))
@@ -68,6 +68,10 @@ module CloneKit
         else
           embedded_attributes[0]
         end
+      end
+
+      def empty_embedded(metadata)
+        metadata.macro == :embeds_many ? [] : nil
       end
 
       def apply_rules_and_save(mapping, attributes)
