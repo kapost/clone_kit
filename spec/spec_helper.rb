@@ -3,6 +3,7 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "clone_kit"
 require "mongoid"
+require "activerecord"
 require "pry"
 require "rspec/collection_matchers"
 require "fakeredis/rspec"
@@ -17,6 +18,7 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.before(:suite) do
+    # todo add activerecord cleaner
     DatabaseCleaner[:mongoid].strategy = :truncation
   end
 

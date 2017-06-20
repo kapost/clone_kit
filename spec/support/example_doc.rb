@@ -28,3 +28,14 @@ class ExampleDoc
 
   validates :name, presence: true
 end
+
+class ExampleActiveRecordDoc < ActiveRecord::Base
+  field :name, type: String
+  field :icon, type: String
+  field :enabled, type: Boolean
+
+  # embeds_many :embedded_example_docs
+  # embeds_one :another_embedded_example_doc
+
+  validates :name, presence: true
+end
