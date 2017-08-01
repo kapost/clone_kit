@@ -1,9 +1,12 @@
 # frozen_string_literal: true
-
+require File.expand_path("../dummy/config/environment", __FILE__)
+puts "dummy configged"
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "clone_kit"
+puts "requiring mongoid"
 require "mongoid"
-require "activerecord"
+puts "got mongoid"
+# require "activerecord"
 require "pry"
 require "rspec/collection_matchers"
 require "fakeredis/rspec"
