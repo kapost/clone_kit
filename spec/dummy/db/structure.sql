@@ -28,6 +28,20 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
@@ -39,30 +53,11 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE example_active_record_docs (
-    id integer NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     icon character varying,
     enabled boolean
 );
-
-
---
--- Name: example_active_record_docs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE example_active_record_docs_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: example_active_record_docs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE example_active_record_docs_id_seq OWNED BY example_active_record_docs.id;
 
 
 --
@@ -72,13 +67,6 @@ ALTER SEQUENCE example_active_record_docs_id_seq OWNED BY example_active_record_
 CREATE TABLE schema_migrations (
     version character varying NOT NULL
 );
-
-
---
--- Name: example_active_record_docs id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY example_active_record_docs ALTER COLUMN id SET DEFAULT nextval('example_active_record_docs_id_seq'::regclass);
 
 
 --

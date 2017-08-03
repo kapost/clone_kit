@@ -1,3 +1,4 @@
 Gemfile.lock
 vendor/ruby
 spec/dummy/log/*
+.byebug_history

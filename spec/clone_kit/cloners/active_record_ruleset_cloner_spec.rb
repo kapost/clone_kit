@@ -6,8 +6,6 @@ require "clone_kit/cloners/active_record_ruleset_cloner"
 RSpec.describe CloneKit::Cloners::ActiveRecordRulesetCloner do
   subject { described_class.new(ExampleActiveRecordDoc) }
 
-  # let(:another_doc) { AnotherEmbeddedExampleDoc.new(color: "yellow") }
-  # let(:embedded_doc) { EmbeddedExampleDoc.new(color: "red") }
   let(:outlet_double) { double("EventOutlet", warn: true, error: true) }
 
   let(:operation) { CloneKit::Operation.new(event_outlet: outlet_double) }
@@ -15,8 +13,8 @@ RSpec.describe CloneKit::Cloners::ActiveRecordRulesetCloner do
   let!(:existing_ids) do
     [
       ExampleActiveRecordDoc.create!(name: "Marge"),
-      ExampleActiveRecordDoc.create!(name: "Large", icon: "vader"), #, another_embedded_example_doc: another_doc),
-      ExampleActiveRecordDoc.create!(name: "Vader", icon: "vader") #, embedded_example_docs: [embedded_doc])
+      ExampleActiveRecordDoc.create!(name: "Large", icon: "vader"),
+      ExampleActiveRecordDoc.create!(name: "Vader", icon: "vader")
     ].map(&:id)
   end
 
@@ -36,45 +34,26 @@ RSpec.describe CloneKit::Cloners::ActiveRecordRulesetCloner do
     expect(clone.map { |r| r["id"] }).to_not match_array(existing_ids)
   end
 
-  # it "clones and re-ids embedded documents" do
-  #   result = clone
-  #   expect(result[2]["embedded_example_docs"][0]["id"]).to_not eql(embedded_doc.id)
-  # end
-
-  it "doesn't assign nil to empty embedded collections" do
-    result = clone
-    expect(result[0]["embedded_example_docs"]).to have(0).items
-  end
-
   it "stores id map correctly" do
     result = clone
     expect(shared_id_map.mapping("ExampleActiveRecordDoc")).to have(3).items.and \
       eql(
-        existing_ids[0].to_s => result[0]["id"].to_s,
-        existing_ids[1].to_s => result[1]["id"].to_s,
-        existing_ids[2].to_s => result[2]["id"].to_s
+        existing_ids[0] => result[0]["id"],
+        existing_ids[1] => result[1]["id"],
+        existing_ids[2] => result[2]["id"]
       )
   end
 
-  # it "stores embedded id map correctly" do
-  #   result = clone
-  #   existing_embedded_id = ExampleActiveRecordDoc.find(existing_ids[2]).embedded_example_docs[0].id
-  #   new_embedded_id = result[2]["embedded_example_docs"][0]["_id"].to_s
-
-  #   expect(shared_id_map.mapping("EmbeddedExampleDoc")).to have(1).item.and \
-  #     eql(
-  #       existing_embedded_id.to_s => new_embedded_id.to_s
-  #     )
-  # end
-
   context "when invalid data is already persisted" do
     before do
-      ExampleActiveRecordDoc.find(existing_ids[0]).set(name: "")
+      id = existing_ids[0]
+      connection = subject.instance_variable_get("@connection")
+      connection.exec("UPDATE example_active_record_docs SET name = NULL WHERE id ='#{id}';")
     end
 
     it "performs model validations" do
       clone
-      expected_message = /ExampleActiveRecordDoc [a-f0-9]{24} failed model validation and was not cloned: Name can't be blank/
+      expected_message = /ExampleActiveRecordDoc [a-f0-9\-]{36} failed model validation and was not cloned: Name can't be blank/
       expect(outlet_double).to have_received(:error).with(expected_message)
     end
   end

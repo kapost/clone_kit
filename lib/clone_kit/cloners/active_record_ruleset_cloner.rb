@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require "clone_kit/rules/allow_only_active_record_fields"
-# require "clone_kit/decorators/embedded_cloner_decorator"
-
 module CloneKit
   module Cloners
     class ActiveRecordRulesetCloner
       attr_accessor :rules
 
-      def initialize(model_klass, rules: [])
+      def initialize(
+        model_klass,
+        rules: [],
+        database_name: database_config.fetch("database")
+      )
         self.model_klass = model_klass
-        self.rules = [
-          CloneKit::Rules::AllowOnlyActiveRecordFields.new(model_klass)
-        ] + rules
+        self.rules = rules
+        self.connection = PG.connect(dbname: database_name)
       end
 
       def clone_ids(ids, operation)
@@ -34,7 +34,14 @@ module CloneKit
       protected
 
       attr_accessor :model_klass,
-                    :current_operation
+                    :current_operation,
+                    :connection
+
+      def database_config
+        return {} unless defined?(Rails)
+
+        Rails.configuration.database_configuration[Rails.env]
+      end
 
       def clone(attributes)
         attributes = attributes.deep_dup
@@ -62,11 +69,10 @@ module CloneKit
 
       def save_or_fail(attributes)
         document_klass = model_klass
-
         model_that_we_wont_save = document_klass.new(attributes)
 
         if model_that_we_wont_save.valid?
-          model_klass.collection.insert(attributes)
+          insert(model_that_we_wont_save)
         else
           details = model_that_we_wont_save.errors.full_messages.to_sentence
           id = attributes["id"]
@@ -74,9 +80,20 @@ module CloneKit
         end
       end
 
+      def insert(model)
+        insert_op = model.class.arel_table.create_insert.tap do |im|
+          im.insert(
+            model.send(:arel_attributes_with_values_for_create, model.attribute_names)
+          )
+        end
+
+        connection.exec(insert_op.to_sql)
+      end
+
       def each_existing_record(ids)
         ids.each do |id|
-          record = model_klass.collection.where(id: id).first
+          find_query = "SELECT * FROM #{model_klass.table_name} WHERE Id='#{id}'"
+          record = connection.exec(find_query).first
           next if record.nil?
 
           yield record

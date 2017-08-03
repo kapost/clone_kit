@@ -21,19 +21,22 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.before(:suite) do
-    # todo add activerecord cleaner
     DatabaseCleaner[:mongoid].strategy = :truncation
+    DatabaseCleaner[:active_record].strategy = :truncation
   end
 
   config.before(:all) do
     DatabaseCleaner[:mongoid].clean
+    DatabaseCleaner[:active_record].clean
   end
 
   config.before :example do |_example|
     DatabaseCleaner[:mongoid].start
+    DatabaseCleaner[:active_record].start
   end
 
   config.after :example do |_example|
     DatabaseCleaner[:mongoid].clean
+    DatabaseCleaner[:active_record].clean
   end
 end
