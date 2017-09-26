@@ -2,14 +2,20 @@
 
 require "spec_helper"
 require "clone_kit/cloners/mongoid_ruleset_cloner"
+require "clone_kit/id_generators/bson"
 
 RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
-  subject { described_class.new(ExampleDoc) }
+  subject do
+    cloner = described_class.new(ExampleDoc)
+    cloner.id_generator = id_generator
+    cloner
+  end
 
   let(:another_doc) { AnotherEmbeddedExampleDoc.new(color: "yellow") }
   let(:embedded_doc) { EmbeddedExampleDoc.new(color: "red") }
   let(:outlet_double) { double("EventOutlet", warn: true, error: true) }
 
+  let(:id_generator) { CloneKit::IdGenerators::Bson.new }
   let(:operation) { CloneKit::Operation.new(event_outlet: outlet_double) }
 
   let!(:existing_ids) do
@@ -20,7 +26,7 @@ RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
     ].map(&:id)
   end
 
-  let(:shared_id_map) { CloneKit::SharedIdMap.new(operation.id) }
+  let(:shared_id_map) { CloneKit::SharedIdMap.new(operation.id, id_generator) }
 
   def clone
     subject.clone_ids(existing_ids, operation)

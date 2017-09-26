@@ -25,13 +25,17 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "redis"
   spec.add_runtime_dependency "activesupport", "> 3.0.0" # For core ext Array#wrap and Object#blank?
 
+  spec.add_development_dependency "pg", '~> 0.18.4'
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "mongoid", "~> 4.0.2"
+  spec.add_development_dependency "activerecord", "~> 4.0"
   spec.add_development_dependency "database_cleaner", "1.5.3"
   spec.add_development_dependency "rake", "~> 11.0"
-  spec.add_development_dependency "rspec", "~> 3.4"
+  spec.add_development_dependency "rspec-rails", "~> 3.4"
   spec.add_development_dependency "rspec-collection_matchers"
   spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "fakeredis"
+  spec.add_development_dependency "combustion", "~> 0.7.0"
+  spec.add_development_dependency "rubocop"
 end

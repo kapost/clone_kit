@@ -3,6 +3,8 @@
 require "clone_kit/version"
 require "clone_kit/graph"
 require "clone_kit/specification"
+require "clone_kit/mongo_specification"
+require "clone_kit/active_record_specification"
 require "clone_kit/operation"
 require "clone_kit/shared_id_map"
 require "clone_kit/rule"

@@ -2,6 +2,7 @@
 
 require "clone_kit/emitters/empty"
 require "clone_kit/cloners/no_op"
+require "clone_kit/id_generators/uuid"
 
 module CloneKit
   class SpecificationError < StandardError; end
@@ -11,10 +12,12 @@ module CloneKit
                   :emitter,
                   :cloner,
                   :dependencies,
-                  :after_operation_block
+                  :after_operation_block,
+                  :id_generator
 
     EMPTY_EMITTER = Emitters::Empty.new
     NO_OP_CLONER = Cloners::NoOp.new
+    UUID_GENERATOR = IdGenerators::Uuid.new
 
     def initialize(model, &block)
       self.model = model
@@ -22,11 +25,14 @@ module CloneKit
       self.cloner = NO_OP_CLONER
       self.dependencies = []
       self.after_operation_block = -> (_op) {}
+      self.id_generator = UUID_GENERATOR
+
+      configure
 
       validate!
 
       model.instance_exec(self, &block)
-
+      cloner.id_generator = id_generator
       CloneKit.add_specification(self)
     end
 
@@ -34,19 +40,14 @@ module CloneKit
       self.after_operation_block = block
     end
 
-    private
+    protected
+
+    def configure
+
+    end
 
     def validate!
-      fail SpecificationError, "Model type not supported" unless mongoid_document?
-      fail SpecificationError, "Cannot clone embedded documents" if mongoid_embedded_document?
-    end
 
-    def mongoid_document?
-      defined?(Mongoid) && model < Mongoid::Document
-    end
-
-    def mongoid_embedded_document?
-      mongoid_document? && model.embedded?
     end
   end
 end

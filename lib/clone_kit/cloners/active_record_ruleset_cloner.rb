@@ -1,19 +1,16 @@
 # frozen_string_literal: true
 
-require "clone_kit/rules/allow_only_mongoid_fields"
 require "clone_kit/decorators/embedded_cloner_decorator"
 
 module CloneKit
   module Cloners
-    class MongoidRulesetCloner
+    class ActiveRecordRulesetCloner
       attr_accessor :rules,
                     :id_generator
 
       def initialize(model_klass, rules: [])
         self.model_klass = model_klass
-        self.rules = [
-          CloneKit::Rules::AllowOnlyMongoidFields.new(model_klass)
-        ] + rules
+        self.rules = rules
       end
 
       def clone_ids(ids, operation)
@@ -38,52 +35,18 @@ module CloneKit
                     :current_operation
 
       def clone(attributes)
-        attributes = attributes.deep_dup
-        clone_all_embedded_fields(attributes)
-        attributes
-      end
-
-      def clone_all_embedded_fields(attributes)
-        model_klass.embedded_relations.each do |name, metadata|
-          attributes[name] = clone_embedded_field(attributes[name], metadata)
-        end
-      end
-
-      def clone_embedded_field(item, metadata)
-        first_item = if item.is_a?(Array)
-                       item = item.compact
-                       item[0]
-                     else
-                       item
-                     end
-
-        return empty_embedded(metadata) if first_item.nil?
-
-        cloner = MongoidRulesetCloner.new(polymorphic_class(metadata.class_name, first_item))
-        cloner.id_generator = id_generator
-        embedded_cloner = CloneKit::Decorators::EmbeddedClonerDecorator.new(cloner, records: Array.wrap(item))
-
-        embedded_attributes = embedded_cloner.clone_embedded(current_operation)
-
-        if metadata.macro == :embeds_many
-          embedded_attributes
-        else
-          embedded_attributes[0]
-        end
-      end
-
-      def empty_embedded(metadata)
-        metadata.macro == :embeds_many ? [] : nil
+        attributes.deep_dup
       end
 
       def apply_rules_and_save(mapping, attributes)
         new_id = generate_new_id
-        old_id = attributes["_id"]
-        mapping[attributes["_id"]] = new_id
-        attributes["_id"] = new_id
+        old_id = attributes[:id]
+        mapping[old_id] = new_id
+        attributes[:id] = new_id
 
         rules.each do |rule|
           begin
+            puts "..rule #{rule}"
             rule.fix(old_id, attributes)
           rescue StandardError => e
             message = "Unhandled error when applying rule #{rule.class.name} to #{model_klass} #{new_id}: #{e.class}"
@@ -101,22 +64,29 @@ module CloneKit
 
       def save_or_fail(attributes)
         document_klass = model_klass
-        document_klass = attributes["_type"].constantize if attributes.key?("_type")
-
         model_that_we_wont_save = document_klass.new(attributes)
-
         if model_that_we_wont_save.valid?
-          model_klass.collection.insert(attributes)
+          insert(model_that_we_wont_save)
         else
           details = model_that_we_wont_save.errors.full_messages.to_sentence
-          id = attributes["_id"]
+          id = attributes[:id]
           current_operation.error("#{model_klass} #{id} failed model validation and was not cloned: #{details}")
         end
       end
 
+      def insert(model)
+        insert_op = model.class.arel_table.create_insert.tap do |insert_mgr|
+          insert_mgr.insert(
+            model.send(:arel_attributes_with_values_for_create, model.attribute_names)
+          )
+        end
+
+        connection.execute(insert_op.to_sql)
+      end
+
       def each_existing_record(ids)
         ids.each do |id|
-          record = model_klass.collection.find(_id: id).one
+          record = connection.execute("SELECT * FROM #{model_klass.table_name} WHERE Id = '#{id}'").first
           next if record.nil?
 
           yield record
@@ -131,14 +101,8 @@ module CloneKit
         end
       end
 
-      private
-
-      def polymorphic_class(class_name, item)
-        if item.key?("_type")
-          item["_type"]
-        else
-          class_name
-        end.constantize
+      def connection
+        ActiveRecord::Base.connection
       end
     end
   end

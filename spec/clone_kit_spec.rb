@@ -22,15 +22,15 @@ RSpec.describe CloneKit do
   end
 
   before do
-    CloneKit::Specification.new(ExampleA) do |spec|
+    CloneKit::MongoSpecification.new(ExampleA) do |spec|
       spec.dependencies = ["ExampleB"]
     end
 
-    CloneKit::Specification.new(ExampleB) do |spec|
+    CloneKit::MongoSpecification.new(ExampleB) do |spec|
       spec.dependencies = ["ExampleC"]
     end
 
-    CloneKit::Specification.new(ExampleC) do |spec|
+    CloneKit::MongoSpecification.new(ExampleC) do |spec|
       spec.dependencies = []
     end
   end
@@ -42,7 +42,7 @@ RSpec.describe CloneKit do
     it "must be a mongoid document" do
       # Modify this once ActiveRecord is supported
       expect {
-        CloneKit::Specification.new(NonMongoidExample) { |spec| }
+        CloneKit::MongoSpecification.new(NonMongoidExample) { |spec| }
       }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
     end
 

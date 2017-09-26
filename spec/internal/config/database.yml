@@ -1,0 +1,8 @@
+#test:
+#  adapter:  sqlite3
+#  database: db/clone_kit_test.sqlite
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: clone_kit_test

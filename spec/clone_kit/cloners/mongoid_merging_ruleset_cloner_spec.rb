@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require "clone_kit/cloners/mongoid_merging_ruleset_cloner"
+require "clone_kit/id_generators/bson"
 
 RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
   let(:existing_ids) do
@@ -12,9 +13,14 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
     ].map(&:id)
   end
 
+  let(:id_generator) { CloneKit::IdGenerators::Bson.new }
   let(:operation) { CloneKit::Operation.new }
 
-  subject { described_class.new(ExampleDoc) }
+  subject do
+    cloner = described_class.new(ExampleDoc)
+    cloner.id_generator = id_generator
+    cloner
+  end
 
   let(:run) { subject.clone_ids(existing_ids, operation) }
 
@@ -31,12 +37,16 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
 
     it "maps old ids to new ones" do
       run
-      expect(CloneKit::SharedIdMap.new(operation.id).mapping("ExampleDoc").keys).to have(3).items.and \
+      expect(CloneKit::SharedIdMap.new(operation.id, id_generator).mapping("ExampleDoc").keys).to have(3).items.and \
         match_array(existing_ids)
     end
 
     context "when merging by another field" do
-      subject { described_class.new(ExampleDoc, merge_fields: ["icon"]) }
+      subject do
+        cloner = described_class.new(ExampleDoc, merge_fields: ["icon"])
+        cloner.id_generator = id_generator
+        cloner
+      end
 
       it "merges using that field" do
         run
