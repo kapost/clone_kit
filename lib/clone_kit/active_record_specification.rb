@@ -16,7 +16,7 @@ module CloneKit
     end
 
     def active_record_document?
-      defined?(ActiveRecord) && model < ActiveRecord
+      defined?(ActiveRecord) && model < ActiveRecord::Base
     end
   end
 end
