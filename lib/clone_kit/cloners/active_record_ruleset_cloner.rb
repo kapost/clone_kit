@@ -40,9 +40,9 @@ module CloneKit
 
       def apply_rules_and_save(mapping, attributes)
         new_id = generate_new_id
-        old_id = attributes[:id]
+        old_id = attributes["id"]
         mapping[old_id] = new_id
-        attributes[:id] = new_id
+        attributes["id"] = new_id
 
         rules.each do |rule|
           begin
@@ -69,7 +69,7 @@ module CloneKit
           insert(model_that_we_wont_save)
         else
           details = model_that_we_wont_save.errors.full_messages.to_sentence
-          id = attributes[:id]
+          id = attributes["id"]
           current_operation.error("#{model_klass} #{id} failed model validation and was not cloned: #{details}")
         end
       end

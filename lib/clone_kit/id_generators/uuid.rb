@@ -3,7 +3,7 @@
 module CloneKit
   module IdGenerators
     class Uuid
-      def next
+      def self.next
         SecureRandom.uuid
       end
 
