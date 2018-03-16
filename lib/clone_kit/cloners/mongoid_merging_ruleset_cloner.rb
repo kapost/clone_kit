@@ -13,7 +13,10 @@ module CloneKit
       def clone_ids(ids, operation)
         @saved_id_map = {}
         initialize_cloner(operation)
-        apply_rules_and_save(find_and_merge_existing_records(ids))
+        result = find_and_merge_existing_records(ids) do |all_records|
+          yield all_records if block_given?
+        end
+        apply_rules_and_save(result)
       end
 
       protected
@@ -50,6 +53,8 @@ module CloneKit
 
         result = []
         skip = Set.new
+
+        yield all_records
 
         all_records.each_with_index do |record, i|
           next if skip.include?(record["_id"])
