@@ -5,12 +5,12 @@ require "clone_kit/cloners/mongoid_merging_ruleset_cloner"
 
 RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
   let(:existing_ids) do
-    [
-      ExampleDoc.create!(name: "Merge Me"),
-      ExampleDoc.create!(name: "Merge Me", icon: "vader"),
-      ExampleDoc.create!(name: "Vader", icon: "vader")
-    ].map(&:id)
+    [doc1, doc2, doc3].map(&:id)
   end
+
+  let(:doc1) { ExampleDoc.create!(name: "Merge Me") }
+  let(:doc2) { ExampleDoc.create!(name: "Merge Me", icon: "vader") }
+  let(:doc3) { ExampleDoc.create!(name: "Vader", icon: "vader")}
 
   let(:operation) { CloneKit::Operation.new }
 
@@ -33,6 +33,10 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
       run
       expect(CloneKit::SharedIdMap.new(operation.id).mapping("ExampleDoc").keys).to have(3).items.and \
         match_array(existing_ids)
+    end
+
+    it "yields all records given a block" do
+      expect { |b| subject.clone_ids(existing_ids, operation, &b) }.to yield_control.once
     end
 
     context "when merging by another field" do
