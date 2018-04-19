@@ -26,7 +26,7 @@ module CloneKit
     end
 
     def tsort_each_child(node, &block)
-      @vertices[node].each(&block)
+      @vertices[node]&.each(&block)
     end
 
     def add_vertex(vertex, *neighbors)
