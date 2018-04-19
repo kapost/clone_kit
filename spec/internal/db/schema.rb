@@ -11,4 +11,9 @@ ActiveRecord::Schema.define do
     t.boolean :enabled
     t.timestamps
   end
+
+  create_table :ar_with_mongoid_deps, id: :uuid, force: true do |t|
+    t.string :name
+    t.string :example_doc_id
+  end
 end
