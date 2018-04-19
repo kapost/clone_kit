@@ -37,7 +37,7 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
 
     it "maps old ids to new ones" do
       run
-      expect(CloneKit::SharedIdMap.new(operation.id, id_generator).mapping("ExampleDoc").keys).to have(3).items.and \
+      expect(CloneKit::SharedIdMap.new(operation.id).mapping("ExampleDoc").keys).to have(3).items.and \
         match_array(existing_ids)
     end
 

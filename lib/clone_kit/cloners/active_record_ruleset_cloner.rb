@@ -5,12 +5,13 @@ require "clone_kit/decorators/embedded_cloner_decorator"
 module CloneKit
   module Cloners
     class ActiveRecordRulesetCloner
-      attr_accessor :rules,
-                    :id_generator
+      attr_accessor :rules, :id_generator
 
-      def initialize(model_klass, rules: [])
+      def initialize(model_klass, rules: [], id_generator: IdGenerators::Uuid.new)
         self.model_klass = model_klass
         self.rules = rules
+        self.id_generator = id_generator
+        register_id_generator_with_rules
       end
 
       def clone_ids(ids, operation)
@@ -24,9 +25,15 @@ module CloneKit
           result << apply_rules_and_save(map, attributes)
         end
 
-        CloneKit::SharedIdMap.new(operation.id, id_generator).insert_many(model_klass, map)
+        CloneKit::SharedIdMap.new(operation.id).insert_many(model_klass, map)
 
         result
+      end
+
+      def register_id_generator_with_rules
+        rules.each do |rule|
+          rule.id_generator = id_generator
+        end
       end
 
       protected

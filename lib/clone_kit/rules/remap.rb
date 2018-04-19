@@ -25,7 +25,7 @@ module CloneKit
       protected
 
       def remap(klass, old_id)
-        shared_id_map.lookup(klass, old_id)
+        shared_id_map.lookup(klass, old_id, id_generator: id_generator)
       rescue ArgumentError
         error_event("#{model_name} missing remapped id for #{klass} #{old_id}")
         nil

@@ -12,12 +12,10 @@ module CloneKit
                   :emitter,
                   :cloner,
                   :dependencies,
-                  :after_operation_block,
-                  :id_generator
+                  :after_operation_block
 
     EMPTY_EMITTER = Emitters::Empty.new
     NO_OP_CLONER = Cloners::NoOp.new
-    UUID_GENERATOR = IdGenerators::Uuid.new
 
     def initialize(model, &block)
       self.model = model
@@ -25,14 +23,12 @@ module CloneKit
       self.cloner = NO_OP_CLONER
       self.dependencies = []
       self.after_operation_block = -> (_op) {}
-      self.id_generator = UUID_GENERATOR
 
       configure
 
       validate!
 
       model.instance_exec(self, &block)
-      cloner.id_generator = id_generator
       CloneKit.add_specification(self)
     end
 

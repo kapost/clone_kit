@@ -26,6 +26,10 @@ module CloneKit
     @spec ||= {}
   end
 
+  def self.reset_graph!
+    @graph = nil
+  end
+
   def self.add_specification(specification)
     spec[specification.model.name] = specification
     refresh_specification(specification)

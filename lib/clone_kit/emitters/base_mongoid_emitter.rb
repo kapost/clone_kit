@@ -6,7 +6,7 @@ module CloneKit
         self.query = query
       end
 
-      def scope(args)
+      def scope(*)
         klass.send(query)
       end
 

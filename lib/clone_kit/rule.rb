@@ -2,6 +2,8 @@
 
 module CloneKit
   class Rule
+    attr_accessor :id_generator
+
     def current_operation=(operation)
       @shared_id_map = nil
       @current_operation = operation

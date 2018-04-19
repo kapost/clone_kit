@@ -6,8 +6,8 @@ module CloneKit
         self.query = query
       end
 
-      def scope(args)
-        klass.send(:query)
+      def scope(*)
+        klass.send(query)
       end
 
       def emit_all

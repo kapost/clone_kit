@@ -8,6 +8,7 @@ module CloneKit
       def initialize(model_klass, rules: [], merge_fields: ["name"])
         super(model_klass, rules: rules)
         self.merge_fields = merge_fields
+        register_id_generator_with_rules
       end
 
       def clone_ids(ids, operation)
@@ -80,7 +81,7 @@ module CloneKit
           result << new_record
         end
 
-        CloneKit::SharedIdMap.new(current_operation.id, id_generator).insert_many(model_klass, @saved_id_map)
+        CloneKit::SharedIdMap.new(current_operation.id).insert_many(model_klass, @saved_id_map)
 
         result
       end

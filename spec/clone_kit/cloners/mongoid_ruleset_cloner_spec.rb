@@ -26,7 +26,7 @@ RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
     ].map(&:id)
   end
 
-  let(:shared_id_map) { CloneKit::SharedIdMap.new(operation.id, id_generator) }
+  let(:shared_id_map) { CloneKit::SharedIdMap.new(operation.id) }
 
   def clone
     subject.clone_ids(existing_ids, operation)

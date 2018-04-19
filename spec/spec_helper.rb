@@ -37,6 +37,7 @@ RSpec.configure do |config|
   config.before :example do |_example|
     DatabaseCleaner[:mongoid].start
     DatabaseCleaner[:active_record].start
+    CloneKit.reset_graph!
   end
 
   config.after :example do |_example|
