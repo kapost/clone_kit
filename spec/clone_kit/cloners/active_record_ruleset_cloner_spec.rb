@@ -5,15 +5,10 @@ require "clone_kit/cloners/active_record_ruleset_cloner"
 require "clone_kit/id_generators/uuid"
 
 RSpec.describe CloneKit::Cloners::ActiveRecordRulesetCloner do
-  subject do
-    cloner = described_class.new(ExampleActiveRecordDoc)
-    cloner.id_generator = id_generator
-    cloner
-  end
+  subject { described_class.new(ExampleActiveRecordDoc) }
 
   let(:outlet_double) { double("EventOutlet", warn: true, error: true) }
 
-  let(:id_generator) { CloneKit::IdGenerators::Uuid }
   let(:operation) { CloneKit::Operation.new(event_outlet: outlet_double) }
 
   let!(:existing_ids) do
