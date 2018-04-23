@@ -66,8 +66,7 @@ module CloneKit
 
         return empty_embedded(metadata) if first_item.nil?
 
-        cloner = MongoidRulesetCloner.new(polymorphic_class(metadata.class_name, first_item))
-        cloner.id_generator = id_generator
+        cloner = MongoidRulesetCloner.new(polymorphic_class(metadata.class_name, first_item), id_generator: id_generator)
         embedded_cloner = CloneKit::Decorators::EmbeddedClonerDecorator.new(cloner, records: Array.wrap(item))
 
         embedded_attributes = embedded_cloner.clone_embedded(current_operation)
