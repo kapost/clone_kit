@@ -53,7 +53,6 @@ module CloneKit
 
         rules.each do |rule|
           begin
-            puts "..rule #{rule}"
             rule.fix(old_id, attributes)
           rescue StandardError => e
             message = "Unhandled error when applying rule #{rule.class.name} to #{model_klass} #{new_id}: #{e.class}"

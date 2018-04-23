@@ -6,7 +6,6 @@ RSpec.describe CloneKit::Operation do
   subject { described_class.new(event_outlet: outlet_double) }
 
   context "when it operates on ActiveRecord models" do
-
     before do
       CloneKit::Specification.new(ExampleDoc) do |spec|
         spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new(self)
@@ -18,8 +17,9 @@ RSpec.describe CloneKit::Operation do
         spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner
           .new(self, rules: [
                  CloneKit::Rules::SafeRemap.new(
-                  self,
-                  "ExampleDoc" => ["example_doc_id"])
+                   self,
+                   "ExampleDoc" => ["example_doc_id"]
+                 )
                ])
         spec.emitter = CloneKit::Emitters::BaseActiveRecordEmitter.new(self)
       end
@@ -62,17 +62,18 @@ RSpec.describe CloneKit::Operation do
         end
 
         let(:cloned_example_doc_ids) do
-          (ExampleDoc.all.to_a - [ example_mongoid_doc_1, example_mongoid_doc_2 ])
+          (ExampleDoc.all.to_a - [example_mongoid_doc_1, example_mongoid_doc_2])
             .map { |doc| doc.id.to_s }
         end
 
         after do
-         expect(cloned_example_doc_ids.length).to eq 2
-         expect { cloned_example_doc_ids.all? { |id| BSON::ObjectId.from_string(id) } }
-          .not_to raise_error, -> { cloned_example_doc_ids }
+          expect(cloned_example_doc_ids.length).to eq 2
+          expect { cloned_example_doc_ids.all? { |id| BSON::ObjectId.from_string(id) } }
+           .not_to raise_error, -> { cloned_example_doc_ids }
 
-          expect(ArWithMongoidDeps.pluck(:id).all? { |id|
-            id.match a_uuid } ).to be_truthy
+          expect(ArWithMongoidDeps.pluck(:id).all? do |id|
+                   id.match a_uuid
+                 end).to be_truthy
         end
 
         it "remaps the ids" do

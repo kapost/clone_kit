@@ -13,13 +13,16 @@ require "pry"
 require "rspec/collection_matchers"
 require "fakeredis/rspec"
 require "database_cleaner"
-require 'simplecov'
+require "simplecov"
 SimpleCov.start
 
 ENV["MONGOID_ENV"] = "test"
 Mongoid.load!("#{File.dirname(__FILE__)}/config/mongoid.yml")
 
-Combustion.initialize! :active_record
+begin
+  Combustion.initialize! :active_record
+rescue
+end
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

@@ -80,7 +80,9 @@ module CloneKit
           result << new_record
         end
 
-        CloneKit::SharedIdMap.new(current_operation.id).insert_many(model_klass, @saved_id_map, id_generator: id_generator)
+        CloneKit::SharedIdMap
+          .new(current_operation.id)
+          .insert_many(model_klass, @saved_id_map, id_generator: id_generator)
 
         result
       end

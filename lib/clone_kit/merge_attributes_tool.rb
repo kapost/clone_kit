@@ -72,7 +72,7 @@ module CloneKit
       attributes.each do |att|
         mergeable.reverse_each do |m|
           val = m[att]
-          unless val.blank?
+          if val.present?
             target[att] = val
             break
           end

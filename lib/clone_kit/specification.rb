@@ -22,7 +22,7 @@ module CloneKit
       self.emitter = EMPTY_EMITTER
       self.cloner = NO_OP_CLONER
       self.dependencies = []
-      self.after_operation_block = -> (_op) {}
+      self.after_operation_block = ->(_op) {}
 
       configure
 
@@ -38,12 +38,8 @@ module CloneKit
 
     protected
 
-    def configure
+    def configure; end
 
-    end
-
-    def validate!
-
-    end
+    def validate!; end
   end
 end

@@ -42,7 +42,8 @@ RSpec.describe CloneKit::SharedIdMap do
             [id_generator.next, id_generator.next],
             [id_generator.next, id_generator.next]
           ]
-        ])
+        ]
+      )
     end
 
     it "stores hash" do

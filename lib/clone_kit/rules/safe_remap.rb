@@ -16,7 +16,7 @@ module CloneKit
 
       def remap(klass, old_id)
         result = shared_id_map
-          .lookup_safe(klass, old_id, safe_value, id_generator: id_generator)
+                 .lookup_safe(klass, old_id, safe_value, id_generator: id_generator)
         warn_event("#{model_name} missing remapped id for #{klass}/#{old_id}") if result == safe_value
         result
       end

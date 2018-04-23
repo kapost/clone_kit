@@ -14,7 +14,7 @@ module CloneKit
             next unless try?(attributes, att)
 
             attributes[att] = if attributes[att].is_a?(Array)
-                                attributes[att].map { |id| remap(klass, id) unless id.blank? }.compact
+                                attributes[att].map { |id| remap(klass, id) if id.present? }.compact
                               else
                                 remap(klass, attributes[att])
                               end
@@ -32,7 +32,7 @@ module CloneKit
       end
 
       def try?(attributes, key)
-        attributes.key?(key) && !attributes[key].blank?
+        attributes.key?(key) && attributes[key].present?
       end
 
       private
