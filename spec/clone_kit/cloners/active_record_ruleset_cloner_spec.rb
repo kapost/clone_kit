@@ -13,7 +13,7 @@ RSpec.describe CloneKit::Cloners::ActiveRecordRulesetCloner do
 
   let(:outlet_double) { double("EventOutlet", warn: true, error: true) }
 
-  let(:id_generator) { CloneKit::IdGenerators::Uuid.new }
+  let(:id_generator) { CloneKit::IdGenerators::Uuid }
   let(:operation) { CloneKit::Operation.new(event_outlet: outlet_double) }
 
   let!(:existing_ids) do

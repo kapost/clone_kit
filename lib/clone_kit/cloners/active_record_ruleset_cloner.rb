@@ -7,7 +7,7 @@ module CloneKit
     class ActiveRecordRulesetCloner
       attr_accessor :rules, :id_generator
 
-      def initialize(model_klass, rules: [], id_generator: IdGenerators::Uuid.new)
+      def initialize(model_klass, rules: [], id_generator: IdGenerators::Uuid)
         self.model_klass = model_klass
         self.rules = rules
         self.id_generator = id_generator

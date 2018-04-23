@@ -10,7 +10,7 @@ module CloneKit
     protected
 
     def configure
-      self.id_generator = IdGenerators::Bson.new
+      self.id_generator = IdGenerators::Bson
     end
 
     def validate!

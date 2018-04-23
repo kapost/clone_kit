@@ -13,13 +13,10 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
     ].map(&:id)
   end
 
-  let(:id_generator) { CloneKit::IdGenerators::Bson.new }
   let(:operation) { CloneKit::Operation.new }
 
   subject do
-    cloner = described_class.new(ExampleDoc)
-    cloner.id_generator = id_generator
-    cloner
+    described_class.new(ExampleDoc)
   end
 
   let(:run) { subject.clone_ids(existing_ids, operation) }
@@ -42,11 +39,7 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
     end
 
     context "when merging by another field" do
-      subject do
-        cloner = described_class.new(ExampleDoc, merge_fields: ["icon"])
-        cloner.id_generator = id_generator
-        cloner
-      end
+      subject { described_class.new(ExampleDoc, merge_fields: ["icon"]) }
 
       it "merges using that field" do
         run

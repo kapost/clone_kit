@@ -8,7 +8,7 @@ module CloneKit
     class MongoidRulesetCloner
       attr_accessor :rules, :id_generator
 
-      def initialize(model_klass, rules: [], id_generator: IdGenerators::Bson.new)
+      def initialize(model_klass, rules: [], id_generator: CloneKit::IdGenerators::Bson)
         self.model_klass = model_klass
         self.rules = [
           CloneKit::Rules::AllowOnlyMongoidFields.new(model_klass)

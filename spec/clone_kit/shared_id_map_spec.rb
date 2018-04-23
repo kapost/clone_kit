@@ -7,7 +7,7 @@ require "clone_kit/id_generators/bson"
 RSpec.describe CloneKit::SharedIdMap do
   subject { described_class.new(ns) }
   let(:ns) { "unique-123" }
-  let(:id_generator) { CloneKit::IdGenerators::Bson.new }
+  let(:id_generator) { CloneKit::IdGenerators::Bson }
 
   let(:old_id) { id_generator.next }
   let(:new_id) { id_generator.next }

@@ -15,7 +15,7 @@ RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
   let(:embedded_doc) { EmbeddedExampleDoc.new(color: "red") }
   let(:outlet_double) { double("EventOutlet", warn: true, error: true) }
 
-  let(:id_generator) { CloneKit::IdGenerators::Bson.new }
+  let(:id_generator) { CloneKit::IdGenerators::Bson }
   let(:operation) { CloneKit::Operation.new(event_outlet: outlet_double) }
 
   let!(:existing_ids) do

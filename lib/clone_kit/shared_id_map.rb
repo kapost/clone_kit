@@ -12,13 +12,13 @@ module CloneKit
       self.redis = redis
     end
 
-    def lookup(klass, original_id, id_generator: IdGenerators::Bson.new)
+    def lookup(klass, original_id, id_generator: IdGenerators::Bson)
       id_generator.from_string(redis.hget(hash_key(klass), original_id.to_s))
     rescue IdGenerators::InvalidId
       raise ArgumentError, "No mapping found for #{klass}. This usually indicates a dependency has not be specified"
     end
 
-    def lookup_safe(klass, original_id, default = nil, id_generator: IdGenerators::Bson.new)
+    def lookup_safe(klass, original_id, default = nil, id_generator: IdGenerators::Bson)
       val = redis.hget(hash_key(klass), original_id.to_s)
       if val.blank?
         default

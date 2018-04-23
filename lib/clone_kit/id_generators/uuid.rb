@@ -7,7 +7,7 @@ module CloneKit
         SecureRandom.uuid
       end
 
-      def from_string(val)
+      def self.from_string(val)
         val
       end
     end
