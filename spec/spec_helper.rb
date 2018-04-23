@@ -13,6 +13,8 @@ require "pry"
 require "rspec/collection_matchers"
 require "fakeredis/rspec"
 require "database_cleaner"
+require 'simplecov'
+SimpleCov.start
 
 ENV["MONGOID_ENV"] = "test"
 Mongoid.load!("#{File.dirname(__FILE__)}/config/mongoid.yml")

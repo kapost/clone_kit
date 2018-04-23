@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "fakeredis"
   spec.add_development_dependency "combustion", "~> 0.7.0"
   spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "simplecov", "~> 0.12.0"
 end

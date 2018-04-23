@@ -1,3 +1,4 @@
 Gemfile.lock
 vendor/ruby
 .pryrc
+coverage
