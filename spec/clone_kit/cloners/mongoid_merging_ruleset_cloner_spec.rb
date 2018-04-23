@@ -15,9 +15,7 @@ RSpec.describe CloneKit::Cloners::MongoidMergingRulesetCloner do
 
   let(:operation) { CloneKit::Operation.new }
 
-  subject do
-    described_class.new(ExampleDoc)
-  end
+  subject { described_class.new(ExampleDoc) }
 
   let(:run) { subject.clone_ids(existing_ids, operation) }
 
