@@ -37,6 +37,7 @@ module CloneKit
 
   def self.refresh_specification(specification)
     graph.add_vertex(specification.model.name, *specification.dependencies)
+    specification.cloner.register_id_generator_with_rules
   end
 
   def self.cloneable_models(already_cloned)

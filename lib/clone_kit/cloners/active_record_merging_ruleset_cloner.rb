@@ -8,7 +8,6 @@ module CloneKit
       def initialize(model_klass, rules: [], merge_fields: ["name"])
         super(model_klass, rules: rules)
         self.merge_fields = merge_fields
-        register_id_generator_with_rules
       end
 
       def clone_ids(ids, operation)
