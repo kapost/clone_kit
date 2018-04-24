@@ -36,14 +36,24 @@ RSpec.describe CloneKit do
   end
 
   describe "Specification" do
-    class NonMongoidExample
+    context "given a mongoid document" do
+      class NonMongoidExample; end
+
+      class NotAnActiveRecordDoc; end
+
+      it "raises unless it's a Mongoid model" do
+        expect {
+          CloneKit::MongoSpecification.new(NonMongoidExample) { |_| }
+        }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+      end
     end
 
-    it "must be a mongoid document" do
-      # Modify this once ActiveRecord is supported
-      expect {
-        CloneKit::MongoSpecification.new(NonMongoidExample) { |spec| }
-      }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+    context "given an ActiveRecord document" do
+      it "raises unless it's an ActiveRecord document" do
+        expect {
+          CloneKit::ActiveRecordSpecification.new(NotAnActiveRecordDoc) { |_| }
+        }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+      end
     end
 
     it "adds to graph" do
