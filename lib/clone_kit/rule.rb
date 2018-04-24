@@ -4,9 +4,18 @@ module CloneKit
   class Rule
     attr_accessor :id_generator
 
+    def initialize(id_generator: nil)
+      @id_generator = id_generator
+    end
+
     def current_operation=(operation)
       @shared_id_map = nil
       @current_operation = operation
+    end
+
+    def id_generator=(generator)
+      return if id_generator
+      @id_generator = generator
     end
 
     protected

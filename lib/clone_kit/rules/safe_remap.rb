@@ -5,11 +5,9 @@ require "clone_kit/rules/remap"
 module CloneKit
   module Rules
     class SafeRemap < Remap
-      attr_accessor :id_generator
-
-      def initialize(model_name, remap_hash = {}, safe_value = nil)
+      def initialize(model_name, remap_hash = {}, safe_value = nil, id_generator: nil)
+        super(model_name, remap_hash, id_generator: id_generator)
         self.safe_value = safe_value
-        super(model_name, remap_hash)
       end
 
       protected

@@ -18,7 +18,8 @@ RSpec.describe CloneKit::Operation do
           .new(self, rules: [
                  CloneKit::Rules::SafeRemap.new(
                    self,
-                   "ExampleDoc" => ["example_doc_id"]
+                   "ExampleDoc" => ["example_doc_id"],
+                   id_generator: CloneKit::IdGenerators::Bson
                  )
                ])
         spec.emitter = CloneKit::Emitters::BaseActiveRecordEmitter.new(self)
@@ -51,6 +52,36 @@ RSpec.describe CloneKit::Operation do
 
       it "the dependencies are cloned" do
         expect { subject.process }.to change(ExampleDoc, :count).by 2
+      end
+
+      context "when a given rule is passed an id_generator" do
+        it "takes prescedence" do
+          expect(CloneKit::IdGenerators::Bson).to receive(:from_string).twice
+          expect(CloneKit::IdGenerators::Uuid).not_to receive(:from_string)
+          subject.process
+        end
+      end
+
+      context "when no optional id_generator args are passed to a rule" do
+        before do
+          CloneKit::Specification.new(ArWithMongoidDeps) do |spec|
+            spec.dependencies = ["ExampleDoc"]
+            spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner
+              .new(self, rules: [
+                     CloneKit::Rules::SafeRemap.new(
+                       self,
+                       "ExampleDoc" => ["example_doc_id"]
+                     )
+                   ])
+            spec.emitter = CloneKit::Emitters::BaseActiveRecordEmitter.new(self)
+          end
+        end
+
+        it "get's it's generator from the cloner" do
+          expect(CloneKit::IdGenerators::Uuid).to receive(:from_string).twice
+          expect(CloneKit::IdGenerators::Bson).not_to receive(:from_string)
+          subject.process
+        end
       end
 
       context "and there is a remapping rule present" do

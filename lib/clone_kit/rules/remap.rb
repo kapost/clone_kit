@@ -3,7 +3,8 @@
 module CloneKit
   module Rules
     class Remap < CloneKit::Rule
-      def initialize(model_name, remap_hash = {})
+      def initialize(model_name, remap_hash = {}, id_generator: nil)
+        super(id_generator: id_generator)
         self.remap_hash = remap_hash
         self.model_name = model_name
       end
