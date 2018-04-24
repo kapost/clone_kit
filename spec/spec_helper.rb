@@ -14,7 +14,9 @@ require "rspec/collection_matchers"
 require "fakeredis/rspec"
 require "database_cleaner"
 require "simplecov"
-SimpleCov.start
+SimpleCov.start do
+  add_filter [ "/spec" ]
+end
 
 ENV["MONGOID_ENV"] = "test"
 Mongoid.load!("#{File.dirname(__FILE__)}/config/mongoid.yml")
