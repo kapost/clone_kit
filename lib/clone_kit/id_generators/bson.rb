@@ -2,7 +2,7 @@
 
 module CloneKit
   module IdGenerators
-    class Bson
+    module Bson
       def self.next
         BSON::ObjectId.new
       end
