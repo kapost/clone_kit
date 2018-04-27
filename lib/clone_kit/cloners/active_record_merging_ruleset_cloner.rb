@@ -5,7 +5,7 @@ require "clone_kit/cloners/active_record_ruleset_cloner"
 module CloneKit
   module Cloners
     class ActiveRecordMergingRulesetCloner < ActiveRecordRulesetCloner
-      ID = "id".freeze
+      ID = "id"
 
       def initialize(model_klass, rules: [], merge_fields: ["name"])
         super(model_klass, rules: rules)
