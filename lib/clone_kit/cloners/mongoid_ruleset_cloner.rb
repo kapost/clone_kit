@@ -82,8 +82,6 @@ module CloneKit
         attributes["_id"] = new_id
 
         rules.each do |rule|
-          rule.id_generator = id_generator
-
           begin
             rule.fix(old_id, attributes)
           rescue StandardError => e
@@ -129,6 +127,7 @@ module CloneKit
 
         rules.each do |rule|
           rule.current_operation = @current_operation
+          rule.id_generator = id_generator
         end
       end
 
