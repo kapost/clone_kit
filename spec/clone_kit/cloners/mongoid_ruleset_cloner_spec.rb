@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require "clone_kit/cloners/mongoid_ruleset_cloner"
+require "clone_kit/id_generators/bson"
 
 RSpec.describe CloneKit::Cloners::MongoidRulesetCloner do
   subject { described_class.new(ExampleDoc) }

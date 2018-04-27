@@ -3,11 +3,11 @@
 require "spec_helper"
 
 RSpec.describe CloneKit do
-  it "has a version number" do
-    expect(CloneKit::VERSION).not_to be nil
-  end
-
   subject { described_class }
+
+  it "has a version number" do
+    expect(CloneKit::VERSION).to_not be nil
+  end
 
   class ExampleA
     include Mongoid::Document
@@ -22,28 +22,38 @@ RSpec.describe CloneKit do
   end
 
   before do
-    CloneKit::Specification.new(ExampleA) do |spec|
+    CloneKit::MongoSpecification.new(ExampleA) do |spec|
       spec.dependencies = ["ExampleB"]
     end
 
-    CloneKit::Specification.new(ExampleB) do |spec|
+    CloneKit::MongoSpecification.new(ExampleB) do |spec|
       spec.dependencies = ["ExampleC"]
     end
 
-    CloneKit::Specification.new(ExampleC) do |spec|
+    CloneKit::MongoSpecification.new(ExampleC) do |spec|
       spec.dependencies = []
     end
   end
 
   describe "Specification" do
-    class NonMongoidExample
+    context "given a mongoid document" do
+      class NonMongoidExample; end
+
+      class NotAnActiveRecordDoc; end
+
+      it "raises unless it's a Mongoid model" do
+        expect {
+          CloneKit::MongoSpecification.new(NonMongoidExample) { |_| }
+        }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+      end
     end
 
-    it "must be a mongoid document" do
-      # Modify this once ActiveRecord is supported
-      expect {
-        CloneKit::Specification.new(NonMongoidExample) { |spec| }
-      }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+    context "given an ActiveRecord document" do
+      it "raises unless it's an ActiveRecord document" do
+        expect {
+          CloneKit::ActiveRecordSpecification.new(NotAnActiveRecordDoc) { |_| }
+        }.to raise_error(CloneKit::SpecificationError, "Model type not supported")
+      end
     end
 
     it "adds to graph" do

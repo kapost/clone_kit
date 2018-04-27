@@ -3,7 +3,8 @@
 module CloneKit
   module Rules
     class Remap < CloneKit::Rule
-      def initialize(model_name, remap_hash = {})
+      def initialize(model_name, remap_hash = {}, id_generator: nil)
+        super(id_generator: id_generator)
         self.remap_hash = remap_hash
         self.model_name = model_name
       end
@@ -14,7 +15,7 @@ module CloneKit
             next unless try?(attributes, att)
 
             attributes[att] = if attributes[att].is_a?(Array)
-                                attributes[att].map { |id| remap(klass, id) unless id.blank? }.compact
+                                attributes[att].map { |id| remap(klass, id) if id.present? }.compact
                               else
                                 remap(klass, attributes[att])
                               end
@@ -25,14 +26,14 @@ module CloneKit
       protected
 
       def remap(klass, old_id)
-        shared_id_map.lookup(klass, old_id)
+        shared_id_map.lookup(klass, old_id, id_generator: id_generator)
       rescue ArgumentError
         error_event("#{model_name} missing remapped id for #{klass} #{old_id}")
         nil
       end
 
       def try?(attributes, key)
-        attributes.key?(key) && !attributes[key].blank?
+        attributes.key?(key) && attributes[key].present?
       end
 
       private

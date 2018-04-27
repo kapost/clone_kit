@@ -5,15 +5,16 @@ require "clone_kit/rules/remap"
 module CloneKit
   module Rules
     class SafeRemap < Remap
-      def initialize(model_name, remap_hash = {}, safe_value = nil)
+      def initialize(model_name, remap_hash = {}, safe_value = nil, id_generator: nil)
+        super(model_name, remap_hash, id_generator: id_generator)
         self.safe_value = safe_value
-        super(model_name, remap_hash)
       end
 
       protected
 
       def remap(klass, old_id)
-        result = shared_id_map.lookup_safe(klass, old_id, safe_value)
+        result = shared_id_map
+                 .lookup_safe(klass, old_id, safe_value, id_generator: id_generator)
         warn_event("#{model_name} missing remapped id for #{klass}/#{old_id}") if result == safe_value
         result
       end

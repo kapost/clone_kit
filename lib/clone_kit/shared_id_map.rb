@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "redis"
+require "clone_kit/id_generators/invalid_id"
 
 module CloneKit
   class SharedIdMap
@@ -11,18 +12,18 @@ module CloneKit
       self.redis = redis
     end
 
-    def lookup(klass, original_id)
-      BSON::ObjectId.from_string(redis.hget(hash_key(klass), original_id.to_s))
-    rescue BSON::ObjectId::Invalid
+    def lookup(klass, original_id, id_generator: IdGenerators::Bson)
+      id_generator.from_string(redis.hget(hash_key(klass), original_id.to_s))
+    rescue IdGenerators::InvalidId
       raise ArgumentError, "No mapping found for #{klass}. This usually indicates a dependency has not be specified"
     end
 
-    def lookup_safe(klass, original_id, default = nil)
+    def lookup_safe(klass, original_id, default = nil, id_generator: IdGenerators::Bson)
       val = redis.hget(hash_key(klass), original_id.to_s)
       if val.blank?
         default
       else
-        BSON::ObjectId.from_string(val)
+        id_generator.from_string(val)
       end
     end
 

@@ -28,6 +28,8 @@ AllCops:
   TargetRubyVersion: 2.3
 Style/AndOr:
   EnforcedStyle: conditionals
+Style/BracesAroundHashParameters:
+  EnforcedStyle: context_dependent
 Style/CaseIndentation:
   IndentOneStep: true
 Style/Documentation:
@@ -97,3 +99,6 @@ Lint/PercentStringArray:
   Exclude:
     # SecureHeaders needs the single quotes in `%w[https: 'self']`
     - config/initializers/secure_headers.rb
+Style/SignalException:
+  Description: 'Checks for proper usage of fail and raise.' # the proper usage is 'raise'
+  Enabled: false

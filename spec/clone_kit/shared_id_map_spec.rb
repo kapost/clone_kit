@@ -2,13 +2,15 @@
 
 require "spec_helper"
 require "clone_kit/shared_id_map"
+require "clone_kit/id_generators/bson"
 
 RSpec.describe CloneKit::SharedIdMap do
   subject { described_class.new(ns) }
   let(:ns) { "unique-123" }
+  let(:id_generator) { CloneKit::IdGenerators::Bson }
 
-  let(:old_id) { BSON::ObjectId.new }
-  let(:new_id) { BSON::ObjectId.new }
+  let(:old_id) { id_generator.next }
+  let(:new_id) { id_generator.next }
 
   before do
     subject.insert(MergableExampleDoc, old_id, new_id)
@@ -31,11 +33,17 @@ RSpec.describe CloneKit::SharedIdMap do
   end
 
   describe "#insert_many" do
-    def new_id
-      BSON::ObjectId.new
-    end
     before do
-      subject.insert_many(ExampleDoc, Hash[[[new_id, new_id], [new_id, new_id], [new_id, new_id]]])
+      subject.insert_many(
+        ExampleDoc,
+        Hash[
+          [
+            [id_generator.next, id_generator.next],
+            [id_generator.next, id_generator.next],
+            [id_generator.next, id_generator.next]
+          ]
+        ]
+      )
     end
 
     it "stores hash" do
