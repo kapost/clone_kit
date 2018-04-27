@@ -21,10 +21,7 @@ end
 ENV["MONGOID_ENV"] = "test"
 Mongoid.load!("#{File.dirname(__FILE__)}/config/mongoid.yml")
 
-begin
-  Combustion.initialize! :active_record
-rescue
-end
+Combustion.initialize! :active_record
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
