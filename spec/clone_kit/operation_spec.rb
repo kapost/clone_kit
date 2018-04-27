@@ -14,51 +14,63 @@ RSpec.describe CloneKit::Operation do
 
       CloneKit::Specification.new(ArWithMongoidDeps) do |spec|
         spec.dependencies = ["ExampleDoc"]
-        spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner
-          .new(self, rules: [
-                 CloneKit::Rules::SafeRemap.new(
-                   self,
-                   "ExampleDoc" => ["example_doc_id"],
-                   id_generator: CloneKit::IdGenerators::Bson
-                 )
-               ])
+        spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner.new(
+          self,
+          rules: [
+            CloneKit::Rules::SafeRemap.new(
+              self,
+              "ExampleDoc" => ["example_doc_id"],
+              id_generator: CloneKit::IdGenerators::Bson
+            )
+          ]
+        )
         spec.emitter = ActiveRecordEmitter.new(self)
       end
     end
 
     context "and there are dependencies on mongoid records" do
-      let!(:example_mongoid_doc_1) do
-        ExampleDoc.create!(name: "one")
-      end
+      let!(:mongoid_doc_1) { ExampleDoc.create!(name: "one") }
+      let!(:mongoid_doc_2) { ExampleDoc.create!(name: "two") }
+      let!(:active_record_doc_1) { ArWithMongoidDeps.create!(name: "one", example_doc_id: mongoid_doc_1.id.to_s) }
+      let!(:active_record_doc_2) { ArWithMongoidDeps.create!(name: "two", example_doc_id: mongoid_doc_2.id.to_s) }
 
-      let!(:example_mongoid_doc_2) do
-        ExampleDoc.create!(name: "two")
-      end
-
-      let(:example_mongoid_doc_1_id) { example_mongoid_doc_1.id.to_s }
-      let(:example_mongoid_doc_2_id) { example_mongoid_doc_2.id.to_s }
-
-      let!(:active_record_1) do
-        ArWithMongoidDeps.create!(name: "one", example_doc_id: example_mongoid_doc_1.id.to_s)
-      end
-
-      let!(:active_record_2) do
-        ArWithMongoidDeps.create!(name: "two", example_doc_id: example_mongoid_doc_2.id.to_s)
-      end
+      let(:mongoid_ids) { [mongoid_doc_1.id, mongoid_doc_2.id] }
+      let(:active_record_ids) { [active_record_doc_1.id, active_record_doc_2.id] }
+      let(:cloned_mongoid_doc_ids) { ExampleDoc.where(id: { "$nin" => mongoid_ids }).pluck(:id) }
+      let(:cloned_active_record_doc_ids) { ArWithMongoidDeps.where.not(id: active_record_ids).pluck(:id) }
 
       it "the original records are cloned" do
-        expect { subject.process }.to change(ArWithMongoidDeps, :count).by 2
+        expect { subject.process }.to change(ArWithMongoidDeps, :count).by(2)
       end
 
       it "the dependencies are cloned" do
-        expect { subject.process }.to change(ExampleDoc, :count).by 2
+        expect { subject.process }.to change(ExampleDoc, :count).by(2)
       end
 
       context "when a given rule is passed an id_generator" do
-        it "takes prescedence" do
-          expect(CloneKit::IdGenerators::Bson).to receive(:from_string).twice
-          expect(CloneKit::IdGenerators::Uuid).not_to receive(:from_string)
+        def stub_generator(generator, times)
+          ids = times.times.map { generator.next }
+          call_count = 0
+
+          allow(generator).to receive(:next) do
+            raise "no more stubbed values" if call_count >= ids.size
+
+            call_count += 1
+            ids[call_count - 1]
+          end
+
+          ids
+        end
+
+        let(:count) { 2 }
+        let!(:uuids) { stub_generator(CloneKit::IdGenerators::Uuid, count) }
+        let!(:bson_ids) { stub_generator(CloneKit::IdGenerators::Bson, count) }
+
+        it "it generates IDs using the provided generator" do
           subject.process
+
+          expect(cloned_active_record_doc_ids).to match_array(uuids)
+          expect(cloned_mongoid_doc_ids).to match_array(bson_ids)
         end
       end
 
@@ -66,51 +78,40 @@ RSpec.describe CloneKit::Operation do
         before do
           CloneKit::Specification.new(ArWithMongoidDeps) do |spec|
             spec.dependencies = ["ExampleDoc"]
-            spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner
-              .new(self, rules: [
-                     CloneKit::Rules::SafeRemap.new(
-                       self,
-                       "ExampleDoc" => ["example_doc_id"]
-                     )
-                   ])
+            spec.cloner = CloneKit::Cloners::ActiveRecordRulesetCloner.new(
+              self,
+              rules: [
+                CloneKit::Rules::SafeRemap.new(
+                  self,
+                  "ExampleDoc" => ["example_doc_id"]
+                )
+              ]
+            )
             spec.emitter = ActiveRecordEmitter.new(self)
           end
         end
 
         it "get's it's generator from the cloner" do
           expect(CloneKit::IdGenerators::Uuid).to receive(:from_string).twice
-          expect(CloneKit::IdGenerators::Bson).not_to receive(:from_string)
+          expect(CloneKit::IdGenerators::Bson).to_not receive(:from_string)
           subject.process
         end
       end
 
       context "and there is a remapping rule present" do
-        let(:a_uuid) { /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/ }
-
         let(:cloned_mongoid_association_ids_from_active_record_models) do
-          ArWithMongoidDeps.pluck(:example_doc_id) -
-            [example_mongoid_doc_1_id, example_mongoid_doc_2_id]
-        end
-
-        let(:cloned_example_doc_ids) do
-          (ExampleDoc.all.to_a - [example_mongoid_doc_1, example_mongoid_doc_2])
-            .map { |doc| doc.id.to_s }
-        end
-
-        after do
-          expect(cloned_example_doc_ids.length).to eq 2
-          expect { cloned_example_doc_ids.all? { |id| BSON::ObjectId.from_string(id) } }
-           .not_to raise_error, -> { cloned_example_doc_ids }
-
-          expect(ArWithMongoidDeps.pluck(:id).all? do |id|
-                   id.match a_uuid
-                 end).to be_truthy
+          ArWithMongoidDeps.pluck(:example_doc_id) - mongoid_ids.map(&:to_s)
         end
 
         it "remaps the ids" do
           subject.process
-          expect(cloned_mongoid_association_ids_from_active_record_models)
-            .to match_array(cloned_example_doc_ids)
+          expect(cloned_mongoid_association_ids_from_active_record_models).to match_array(cloned_mongoid_doc_ids)
+        end
+
+        it "creates the correct records" do
+          subject.process
+          expect(cloned_mongoid_doc_ids).to have(2).items.and all(be_bson_id)
+          expect(cloned_active_record_doc_ids).to have(2).items.and all(be_uuid)
         end
       end
     end

@@ -31,6 +31,8 @@ end
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
+  config.filter_run_when_matching :focus
+
   config.before(:suite) do
     DatabaseCleaner[:mongoid].strategy = :truncation
     DatabaseCleaner[:active_record].strategy = :truncation

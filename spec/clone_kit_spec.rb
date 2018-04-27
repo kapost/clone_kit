@@ -3,11 +3,11 @@
 require "spec_helper"
 
 RSpec.describe CloneKit do
-  it "has a version number" do
-    expect(CloneKit::VERSION).not_to be nil
-  end
-
   subject { described_class }
+
+  it "has a version number" do
+    expect(CloneKit::VERSION).to_not be nil
+  end
 
   class ExampleA
     include Mongoid::Document

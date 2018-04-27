@@ -13,11 +13,6 @@ module CloneKit
       @current_operation = operation
     end
 
-    def id_generator=(generator)
-      return if id_generator
-      @id_generator = generator
-    end
-
     protected
 
     attr_reader :current_operation

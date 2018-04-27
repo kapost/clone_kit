@@ -14,7 +14,6 @@ module CloneKit
           CloneKit::Rules::AllowOnlyMongoidFields.new(model_klass)
         ] + rules
         self.id_generator = id_generator
-        register_id_generator_with_rules
       end
 
       def clone_ids(ids, operation)
@@ -31,12 +30,6 @@ module CloneKit
         CloneKit::SharedIdMap.new(operation.id).insert_many(model_klass, map)
 
         result
-      end
-
-      def register_id_generator_with_rules
-        rules.each do |rule|
-          rule.id_generator = id_generator
-        end
       end
 
       protected
@@ -89,6 +82,8 @@ module CloneKit
         attributes["_id"] = new_id
 
         rules.each do |rule|
+          rule.id_generator = id_generator
+
           begin
             rule.fix(old_id, attributes)
           rescue StandardError => e

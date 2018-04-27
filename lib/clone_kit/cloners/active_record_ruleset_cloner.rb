@@ -11,7 +11,6 @@ module CloneKit
         self.model_klass = model_klass
         self.rules = rules
         self.id_generator = id_generator
-        register_id_generator_with_rules
       end
 
       def clone_ids(ids, operation)
@@ -30,12 +29,6 @@ module CloneKit
         result
       end
 
-      def register_id_generator_with_rules
-        rules.each do |rule|
-          rule.id_generator = id_generator
-        end
-      end
-
       protected
 
       attr_accessor :model_klass,
@@ -52,6 +45,8 @@ module CloneKit
         attributes["id"] = new_id
 
         rules.each do |rule|
+          rule.id_generator = id_generator
+
           begin
             rule.fix(old_id, attributes)
           rescue StandardError => e

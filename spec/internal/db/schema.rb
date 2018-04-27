@@ -15,5 +15,6 @@ ActiveRecord::Schema.define do
   create_table :ar_with_mongoid_deps, id: :uuid, force: true do |t|
     t.string :name
     t.string :example_doc_id
+    t.timestamps
   end
 end
