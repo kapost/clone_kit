@@ -87,7 +87,7 @@ module CloneKit
 
       def each_existing_record(ids)
         ids.each do |id|
-          record = connection.execute("SELECT * FROM #{model_klass.table_name} WHERE Id = '#{id}'").first
+          record = model_klass.find_by(model_klass.primary_key => id).attributes
           next if record.nil?
 
           yield record
