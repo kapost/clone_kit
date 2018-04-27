@@ -9,7 +9,7 @@ RSpec.describe CloneKit::Operation do
     before do
       CloneKit::Specification.new(ExampleDoc) do |spec|
         spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new(self)
-        spec.emitter = CloneKit::Emitters::BaseMongoidEmitter.new(self)
+        spec.emitter = MongoidEmitter.new(self)
       end
 
       CloneKit::Specification.new(ArWithMongoidDeps) do |spec|
@@ -22,7 +22,7 @@ RSpec.describe CloneKit::Operation do
                    id_generator: CloneKit::IdGenerators::Bson
                  )
                ])
-        spec.emitter = CloneKit::Emitters::BaseActiveRecordEmitter.new(self)
+        spec.emitter = ActiveRecordEmitter.new(self)
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe CloneKit::Operation do
                        "ExampleDoc" => ["example_doc_id"]
                      )
                    ])
-            spec.emitter = CloneKit::Emitters::BaseActiveRecordEmitter.new(self)
+            spec.emitter = ActiveRecordEmitter.new(self)
           end
         end
 

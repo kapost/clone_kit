@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "clone_kit/emitters/base_mongoid_emitter"
 require "clone_kit/cloners/mongoid_ruleset_cloner"
 
 class EmbeddedExampleDoc
