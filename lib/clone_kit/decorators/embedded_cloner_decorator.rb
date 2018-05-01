@@ -10,7 +10,7 @@ module CloneKit
       def initialize(cloner, records:)
         @records = records
 
-        cloner.define_singleton_method(:each_existing_record) do |ids, &block|
+        cloner.define_singleton_method(:each_existing_record) do |ids, _operation, &block|
           records.compact.select { |r| ids.include?(r["_id"]) }.each do |record|
             block.call(record)
           end
