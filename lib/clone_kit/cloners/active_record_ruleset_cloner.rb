@@ -73,14 +73,16 @@ module CloneKit
         end
       end
 
-      def insert(model)
-        insert_op = model.class.arel_table.create_insert.tap do |insert_mgr|
+      def insert(record)
+        insert_op = record.class.arel_table.create_insert.tap do |insert_mgr|
           insert_mgr.insert(
-            model.send(:arel_attributes_with_values_for_create, model.attribute_names)
+            record.send(:arel_attributes_with_values_for_create, record.attribute_names)
           )
         end
 
-        connection.execute(insert_op.to_sql)
+        with_connection(current_operation.arguments["database_url"]) do |conn|
+          conn.execute(insert_op.to_sql)
+        end
       end
 
       def each_existing_record(ids)
@@ -101,8 +103,16 @@ module CloneKit
         end
       end
 
-      def connection
-        ActiveRecord::Base.connection
+      def with_connection(database_url)
+        original_config = ActiveRecord::Base.connection_config
+        dynamic_config = database_url || original_config
+
+        begin
+          ActiveRecord::Base.establish_connection(dynamic_config)
+          yield ActiveRecord::Base.connection
+        ensure
+          ActiveRecord::Base.establish_connection(original_config)
+        end
       end
     end
   end
