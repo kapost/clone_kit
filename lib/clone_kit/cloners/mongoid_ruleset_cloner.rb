@@ -117,7 +117,7 @@ module CloneKit
 
       def each_existing_record(ids, operation)
         ids.each do |id|
-          record = document_finder.find(model_klass, operation, id)
+          record = document_finder.find(model_klass: model_klass, clone_operation: operation, id:id)
           next if record.nil?
 
           yield record
