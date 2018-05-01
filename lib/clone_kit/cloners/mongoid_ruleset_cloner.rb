@@ -115,7 +115,7 @@ module CloneKit
 
       def each_existing_record(ids)
         ids.each do |id|
-          record = model_klass.collection.find(_id: id).one
+          record = model_klass.find(id).attributes
           next if record.nil?
 
           yield record
