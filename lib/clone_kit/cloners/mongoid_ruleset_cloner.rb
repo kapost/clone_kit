@@ -8,8 +8,9 @@ module CloneKit
     class MongoidRulesetCloner
       attr_accessor :rules, :id_generator
 
-      def initialize(model_klass, rules: [], id_generator: CloneKit::IdGenerators::Bson)
+      def initialize(model_klass, document_finder:, rules: [], id_generator: CloneKit::IdGenerators::Bson)
         self.model_klass = model_klass
+        self.document_finder = document_finder
         self.rules = [
           CloneKit::Rules::AllowOnlyMongoidFields.new(model_klass)
         ] + rules
@@ -22,7 +23,7 @@ module CloneKit
         map = {}
         result = []
 
-        each_existing_record(ids) do |attributes|
+        each_existing_record(ids, operation) do |attributes|
           attributes = clone(attributes)
           result << apply_rules_and_save(map, attributes)
         end
@@ -35,7 +36,8 @@ module CloneKit
       protected
 
       attr_accessor :model_klass,
-                    :current_operation
+                    :current_operation,
+                    :document_finder
 
       def clone(attributes)
         attributes = attributes.deep_dup
@@ -113,9 +115,9 @@ module CloneKit
         end
       end
 
-      def each_existing_record(ids)
+      def each_existing_record(ids, operation)
         ids.each do |id|
-          record = model_klass.find(id).attributes
+          record = document_finder.find(model_klass, operation, id)
           next if record.nil?
 
           yield record

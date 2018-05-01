@@ -13,7 +13,7 @@ module CloneKit
       def clone_ids(ids, operation)
         @saved_id_map = {}
         initialize_cloner(operation)
-        apply_rules_and_save(find_and_merge_existing_records(ids))
+        apply_rules_and_save(find_and_merge_existing_records(ids, operation))
       end
 
       protected
@@ -42,9 +42,9 @@ module CloneKit
 
       attr_accessor :merge_fields
 
-      def find_and_merge_existing_records(ids)
+      def find_and_merge_existing_records(ids, operation)
         all_records = []
-        each_existing_record(ids) do |rec|
+        each_existing_record(ids, operation) do |rec|
           all_records << rec
         end
 
