@@ -80,11 +80,13 @@ module CloneKit
           )
         end
 
-        ActiveRecord::Base.connection.execute(insert_op.to_sql)
+        with_connection(current_operation.arguments["write_database_url"]) do
+          ActiveRecord::Base.connection.execute(insert_op.to_sql)
+        end
       end
 
       def each_existing_record(ids)
-        with_connection(current_operation.arguments["database_url"]) do
+        with_connection(current_operation.arguments["read_database_url"]) do
           ids.each do |id|
             record = model_klass.find_by(model_klass.primary_key => id).attributes
             next if record.nil?
