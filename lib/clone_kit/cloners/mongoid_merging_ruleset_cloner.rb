@@ -5,8 +5,8 @@ require "clone_kit/cloners/mongoid_ruleset_cloner"
 module CloneKit
   module Cloners
     class MongoidMergingRulesetCloner < MongoidRulesetCloner
-      def initialize(model_klass, rules: [], merge_fields: ["name"])
-        super(model_klass, rules: rules)
+      def initialize(model_klass, document_finder:, rules: [], merge_fields: ["name"] )
+        super(model_klass, document_finder: document_finder, rules: rules)
         self.merge_fields = merge_fields
       end
 
