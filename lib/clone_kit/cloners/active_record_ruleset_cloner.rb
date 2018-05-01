@@ -80,17 +80,17 @@ module CloneKit
           )
         end
 
-        with_connection(current_operation.arguments["database_url"]) do |conn|
-          conn.execute(insert_op.to_sql)
-        end
+        ActiveRecord::Base.connection.execute(insert_op.to_sql)
       end
 
       def each_existing_record(ids)
-        ids.each do |id|
-          record = model_klass.find_by(model_klass.primary_key => id).attributes
-          next if record.nil?
+        with_connection(current_operation.arguments["database_url"]) do
+          ids.each do |id|
+            record = model_klass.find_by(model_klass.primary_key => id).attributes
+            next if record.nil?
 
-          yield record
+            yield record
+          end
         end
       end
 
@@ -109,7 +109,7 @@ module CloneKit
 
         begin
           ActiveRecord::Base.establish_connection(dynamic_config)
-          yield ActiveRecord::Base.connection
+          yield
         ensure
           ActiveRecord::Base.establish_connection(original_config)
         end
