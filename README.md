@@ -26,15 +26,15 @@ You can specify the dependency order of cloning, the scope of the operation, and
 
 ```ruby
 CloneKit::Specification.new(BlogPost) do |spec|
-spec.dependencies = %w(Account BlogType)                     # Helps derive the cloning order
-  spec.emitter = TenantEmitter.new(BlogPost)                 # The scope of the operation for this collection
-  spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new( # The cloning behavior
-    BlogPost,
-    rules: [
-      ReTenantRule.new,
-      CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
-    ]
-  )
+  spec.dependencies = %w(Account BlogType)                     # Helps derive the cloning order
+    spec.emitter = TenantEmitter.new(BlogPost)                 # The scope of the operation for this collection
+    spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new( # The cloning behavior
+      BlogPost,
+      rules: [
+        ReTenantRule.new,
+        CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
+      ]
+    )
 end
 ```
 
@@ -62,11 +62,15 @@ gem 'clone_kit'
 
 And then execute:
 
-    $ bundle
+```bash
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install clone_kit
+```bash
+$ gem install clone_kit
+```
 
 ## Development
 
