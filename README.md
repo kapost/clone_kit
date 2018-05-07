@@ -35,22 +35,94 @@ CloneKit::Specification.new(BlogPost) do |spec|
         CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
       ]
     )
+    spec.after_operation do |operation|
+      ...
+    end
 end
 ```
 
 ## Writing an Emitter
 
-You have to write some emitters for your app. By default, CloneKit specifications utilize and empty emitter, making all clones no-operations.
+By default, CloneKit specifications utilize an empty emitter, making all clones no-ops. Emitters are expected to make db calls using logic defined in the emitter.
 
-TODO
+#### Emitter rules
+  - Emitters must respond to `#emit_all` and `#scope`.
+  - `emit_all` must return an object that responds to `#pluck`.
 
-## Writing a Cloner
+```ruby
+CloneKit::ActiveRecordSpecification.new(BlogPost) do |spec|
+  ...
+  spec.emitter = ActiveRecordEmitter.new(BlogPost)
+  ...
+end
 
-TODO
+class ActiveRecordEmitter
+  def initialize(klass)
+    self.klass = klass
+  end
 
-## Extending the built-in Cloners
+  def scope(*)
+    klass.all # add any scope restrictions here
+  end
 
-TODO
+  def emit_all # the method that will be used to pluck the record ids
+    scope
+  end
+
+  private
+
+  attr_accessor :klass
+end
+```
+
+## Custom Cloners
+
+Cloners are the classes that determine what model class is cloned and how. There are several built-in cloners that can be extended. See `lib/clone_kit/cloners` for a list.
+
+Custom cloners will need to define:
+
+1. The Mongoid or ActiveRecord model class, which will be used to make db calls
+2. Rules, which are executed in the defined order and determine how the ids are mapped from source to destination records. See more in next section.
+3. Merge fields, which allow two records to be merged into one provided all listed fields are equal.
+
+Optionally, if you are merging records you will probably want to override the `compare` and `merge` methods with custom logic, though basic logic comes for free.
+
+```ruby
+CloneKit::ActiveRecordSpecification.new(self) do |spec|
+  ...
+  spec.cloner = BlogPostCloner.new
+  ...
+end
+
+class BlogPostCloner < ActiveRecordRulesetCloner
+  OMIT_ATTRIBUTES = [:created_at, :updated_at]
+
+  def initialize
+    super(
+      BlogPost,                                           # model class
+      rules: [                                            # rules
+        CloneKit::Rules::Except.new(*OMIT_ATTRIBUTES),
+        CloneKit::Rules::Remap.new(BlogPost)
+      ],
+      merge_fields: [])                                   # merge fields
+  end
+
+  def compare(first, second)
+    # returns a boolean to determine if two records are mergeable
+  end
+
+  def merge(records)
+    # returns a single record that is the merged result
+    # of all argument `records`,
+    # e.g. [{ a: 1, b: 1 }, { a: 2, b: 1}] => { a: 2, b: 1 }
+  end
+end
+
+```
+
+## Writing a Cloner rule
+
+Rules respond to a single `#fix` method. TODO - more thorough description
 
 ## Installation
 
