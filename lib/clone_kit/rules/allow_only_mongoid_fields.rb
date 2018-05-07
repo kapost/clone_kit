@@ -2,8 +2,10 @@
 
 module CloneKit
   module Rules
-    # The purpose of this rule is to only include attributes that are presently defined on the model
-    # (and its embedded models)
+    #
+    # The purpose of this rule is to only include attributes that are
+    # presently defined on the model (and its embedded models)
+
     class AllowOnlyMongoidFields < CloneKit::Rule
       def initialize(model_klass)
         self.model_klass = model_klass
