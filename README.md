@@ -122,7 +122,22 @@ end
 
 ## Writing a Cloner rule
 
-Rules respond to a single `#fix` method. TODO - more thorough description
+Rules respond to a single `#fix` method. `#fix` mutates a record's attributes, allowing the same `attributes` object to be passed down a pipeline of rules.
+
+```ruby
+# given the following rules
+rules: [
+  CloneKit::Rules::Except.new(:title),
+  CloneKit::Rules::Remap.new(BlogPost, "Author" => "author_id" )
+]
+
+# a blog post's attributes will be changed
+{ title: "Title", content: "Content", author_id: 5 }
+{ content: "Content", author_id: 5 } # CloneKit::Rules::Except
+{ content: "Content", author_id: 6 } # CloneKit::Rules::Remap
+```
+
+See `lib/clone_kit/rules` for examples with documentation.
 
 ## Installation
 
@@ -152,4 +167,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/clone_kit.
+Bug reports and pull requests are welcome on GitHub at https://github.com/kapost/clone_kit.

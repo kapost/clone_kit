@@ -4,6 +4,10 @@ require "clone_kit/rules/remap"
 
 module CloneKit
   module Rules
+    #
+    # Operates like Remap, but returns a default value instead of `nil`.
+    # When the default is used, the event outlet receives a #warn message.
+
     class SafeRemap < Remap
       def initialize(model_name, remap_hash = {}, safe_value = nil, id_generator: nil)
         super(model_name, remap_hash, id_generator: id_generator)
