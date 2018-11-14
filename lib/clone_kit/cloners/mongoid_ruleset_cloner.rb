@@ -107,10 +107,40 @@ module CloneKit
         if model_that_we_wont_save.valid?
           model_klass.collection.insert(attributes)
         else
-          details = model_that_we_wont_save.errors.full_messages.to_sentence
-          id = attributes["_id"]
-          current_operation.error("#{model_klass} #{id} failed model validation and was not cloned: #{details}")
+          report_errors(attributes, model_that_we_wont_save)
         end
+      end
+
+      def report_errors(attributes, model)
+        model_error = model.errors.full_messages.to_sentence
+        embedded_errors = collect_embedded_errors(model)
+        id = attributes["_id"]
+
+        current_operation.error("#{model_klass} #{id} failed model validation and was not cloned: #{model_error}")
+
+        embedded_errors.each do |e|
+          current_operation.error("[#{model_klass} #{id}]: #{e}")
+        end
+      end
+
+      def collect_embedded_errors(model)
+        embedded_documents(model).each_with_object([]) do |doc, accum|
+          next if doc.blank? || doc.valid?
+
+          klass = doc.class
+          id = doc._id.to_s
+          error = doc.errors.full_messages.to_sentence
+
+          accum << "Embedded #{klass} #{id} failed model validation: #{error}"
+        end
+      end
+
+      def embedded_documents(model)
+        model.associations
+             .select { |_key, assoc| assoc.embedded? }
+             .keys
+             .map { |field| model.send(field) }
+             .flatten
       end
 
       def each_existing_record(ids)
