@@ -10,7 +10,7 @@ jobs:
         environment:
           POSTGRES_USER: circleci
           POSTGRES_DB: clone_kit_test
-      - image: kapost/mongo:3.0
+      - image: kapost/mongo:3.2
 
     working_directory: ~/clone_kit
 
