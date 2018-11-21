@@ -36,6 +36,10 @@ module CloneKit
       self.after_operation_block = block
     end
 
+    def dependencies
+      @dependencies.respond_to?(:call) ? @dependencies.call : @dependencies
+    end
+
     protected
 
     def configure; end
