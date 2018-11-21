@@ -1,6 +1,6 @@
 # CloneKit!
 
-An ActiveRecord-ish toolkit library for building database record cloning without the business logic and executing cloning operations, especially for multi-tenant applications using Mongoid.
+An ActiveRecord-ish toolkit library for building database record cloning without the business logic and executing cloning operations, especially for multi-tenant applications using ActiveRecord or Mongoid.
 
 ## Why does cloning require a special toolkit?
 
@@ -25,19 +25,27 @@ end
 You can specify the dependency order of cloning, the scope of the operation, and the specific cloning behavior inside a specification:
 
 ```ruby
-CloneKit::Specification.new(BlogPost) do |spec|
-  spec.dependencies = %w(Account BlogType)                     # Helps derive the cloning order
-    spec.emitter = TenantEmitter.new(BlogPost)                 # The scope of the operation for this collection
-    spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new( # The cloning behavior
-      BlogPost,
-      rules: [
-        ReTenantRule.new,
-        CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
-      ]
-    )
-    spec.after_operation do |operation|
-      ...
-    end
+CloneKit::MongoSpecification.new(BlogPost) do |spec|
+  spec.dependencies = %w(Account BlogType)                   # Helps derive the cloning order
+  spec.emitter = TenantEmitter.new(BlogPost)                 # The scope of the operation for this collection
+  spec.cloner = CloneKit::Cloners::MongoidRulesetCloner.new( # The cloning behavior
+    BlogPost,
+    rules: [
+      ReTenantRule.new,
+      CloneKit::Rules::Remap.new("BlogPost", "Account" => "account_id", "BlogType" => "blog_type_id")
+    ]
+  )
+  spec.after_operation do |operation|
+    ...
+  end
+end
+```
+
+Dependencies can also be dynamically defined by using a proc or lambda:
+
+```ruby
+CloneKit::MongoSpecification.new(BlogPost) do |spec|
+  spec.dependencies = ->{ env.test? ? %w(Foo) : %w(Bar)  }
 end
 ```
 
@@ -61,12 +69,12 @@ class ActiveRecordEmitter
     self.klass = klass
   end
 
-  def scope(*)
+  def scope(_args)
     klass.all # add any scope restrictions here
   end
 
-  def emit_all # the method that will be used to pluck the record ids
-    scope
+  def emit_all(args) # the method that will be used to pluck the record ids
+    scope(args)
   end
 
   private
