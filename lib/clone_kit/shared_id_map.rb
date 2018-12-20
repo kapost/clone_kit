@@ -39,6 +39,10 @@ module CloneKit
       end
     end
 
+    def delete(klass)
+      redis.del(hash_key(klass))
+    end
+
     def mapping(klass)
       Hash[redis.hgetall(hash_key(klass)).map { |k, v| [k, v] }]
     end
