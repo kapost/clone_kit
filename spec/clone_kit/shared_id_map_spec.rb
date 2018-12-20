@@ -50,4 +50,23 @@ RSpec.describe CloneKit::SharedIdMap do
       expect(subject.mapping(ExampleDoc)).to have(3).items
     end
   end
+
+  describe "#delete" do
+    before do
+      subject.insert_many(
+        ExampleDoc,
+        Hash[
+          [
+            [id_generator.next, id_generator.next],
+            [id_generator.next, id_generator.next],
+            [id_generator.next, id_generator.next]
+          ]
+        ]
+      )
+    end
+
+    it "removes hash" do
+      expect { subject.delete(ExampleDoc) }.to change { subject.mapping(ExampleDoc) }.to({})
+    end
+  end
 end
