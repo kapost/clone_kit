@@ -22,7 +22,7 @@ module CloneKit
             already_cloned: operation.already_cloned + model_specs.map(&:model).map(&:to_s),
             id: operation.id,
             arguments: operation.arguments,
-            strategy: CloneKit::Strategies::Synchronous
+            strategy: self.class
           }
         )
       end
