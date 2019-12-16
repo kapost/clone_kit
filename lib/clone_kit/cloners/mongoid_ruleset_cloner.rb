@@ -105,7 +105,7 @@ module CloneKit
         model_that_we_wont_save = document_klass.new(attributes)
 
         if model_that_we_wont_save.valid?
-          model_klass.collection.insert(attributes)
+          model_klass.collection.insert_one(attributes)
         else
           report_errors(attributes, model_that_we_wont_save)
         end
@@ -145,7 +145,7 @@ module CloneKit
 
       def each_existing_record(ids)
         ids.each do |id|
-          record = model_klass.collection.find(_id: id).one
+          record = model_klass.collection.find(_id: id).first
           next if record.nil?
 
           yield record

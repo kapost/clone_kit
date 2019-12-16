@@ -1,5 +1,5 @@
 defaults: &defaults
-  sessions:
+  clients:
     default:
       database: clone_kit
       hosts:
