@@ -75,9 +75,7 @@ module CloneKit
 
       def insert(model)
         insert_op = model.class.arel_table.create_insert.tap do |insert_mgr|
-          insert_mgr.insert(
-            model.send(:arel_attributes_with_values_for_create, model.attribute_names)
-          )
+          insert_mgr.insert(arel_attributes_with_values_for_create(model))
         end
 
         connection.execute(insert_op.to_sql)
@@ -103,6 +101,22 @@ module CloneKit
 
       def connection
         ActiveRecord::Base.connection
+      end
+
+      private
+
+      # This method has been deprecated in rails 5.2 (https://github.com/rails/rails/commit/2f45157f2ebbe4f3fa43d3998b459c8eb9ec2b89)
+      # Workarounds to this method started to fail other parts of the code base. Hence I am defining it here.
+      def arel_attributes_with_values_for_create(model)
+        attrs = {}
+        arel_table = model.class.arel_table
+        attribute_names = model.send(:attributes_for_create, model.attribute_names)
+
+        attribute_names.each do |name|
+          attrs[arel_table[name]] = model.send(:_read_attribute, name)
+        end
+
+        attrs
       end
     end
   end
